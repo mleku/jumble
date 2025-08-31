@@ -1,5 +1,6 @@
 import { Event, nip19 } from 'nostr-tools'
 import { getNoteBech32Id } from './event'
+import { TSearchParams } from '@/types'
 
 export const toHome = () => '/'
 export const toNote = (eventOrId: Event | string) => {
@@ -51,7 +52,16 @@ export const toOthersRelaySettings = (pubkey: string) => {
   const npub = nip19.npubEncode(pubkey)
   return `/users/${npub}/relays`
 }
-export const toSearch = () => '/search'
+export const toSearch = (params?: TSearchParams) => {
+  if (!params) return '/search'
+  const query = new URLSearchParams()
+  query.set('t', params.type)
+  query.set('q', params.search)
+  if (params.input) {
+    query.set('i', params.input)
+  }
+  return `/search?${query.toString()}`
+}
 export const toSettings = () => '/settings'
 export const toRelaySettings = (tag?: 'mailbox' | 'favorite-relays') => {
   return '/settings/relays' + (tag ? '#' + tag : '')

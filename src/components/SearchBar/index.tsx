@@ -18,16 +18,19 @@ import { HTMLAttributes, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 export function SearchBar({
+  input,
+  setInput,
   onSearch,
-  active
+  autoFocus = true
 }: {
+  input: string
+  setInput: (input: string) => void
   onSearch: (params: TSearchParams | null) => void
-  active?: boolean
+  autoFocus?: boolean
 }) {
   const { t } = useTranslation()
   const { push } = useSecondaryPage()
   const { isSmallScreen } = useScreenSize()
-  const [input, setInput] = useState('')
   const [debouncedInput, setDebouncedInput] = useState(input)
   const { profiles } = useSearchProfiles(debouncedInput, 10)
   const [searching, setSearching] = useState(false)
@@ -51,10 +54,10 @@ export function SearchBar({
   }, [input])
 
   useEffect(() => {
-    if (active) {
+    if (autoFocus) {
       searchInputRef.current?.focus()
     }
-  }, [active])
+  }, [])
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -79,12 +82,9 @@ export function SearchBar({
     const search = input.trim()
     if (!search) return null
 
-    const updateSearch = (params: TSearchParams, newInput?: string) => {
-      onSearch(params)
+    const updateSearch = (params: TSearchParams) => {
       blur()
-      if (newInput) {
-        setInput(newInput)
-      }
+      onSearch(params)
     }
 
     if (/^[0-9a-f]{64}$/.test(search)) {
@@ -133,12 +133,12 @@ export function SearchBar({
         <NormalItem search={search} onClick={() => updateSearch({ type: 'notes', search })} />
         <HashtagItem
           search={search}
-          onClick={() => updateSearch({ type: 'hashtag', search }, `#${search}`)}
+          onClick={() => updateSearch({ type: 'hashtag', search, input: `#${search}` })}
         />
         {!!normalizedUrl && (
           <RelayItem
             url={normalizedUrl}
-            onClick={() => updateSearch({ type: 'relay', search }, normalizedUrl)}
+            onClick={() => updateSearch({ type: 'relay', search, input: normalizedUrl })}
           />
         )}
         {profiles.map((profile) => (
@@ -146,7 +146,7 @@ export function SearchBar({
             key={profile.pubkey}
             profile={profile}
             onClick={() =>
-              updateSearch({ type: 'profile', search: profile.npub }, profile.username)
+              updateSearch({ type: 'profile', search: profile.npub, input: profile.username })
             }
           />
         ))}
