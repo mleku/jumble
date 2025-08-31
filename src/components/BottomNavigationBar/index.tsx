@@ -3,6 +3,7 @@ import AccountButton from './AccountButton'
 import ExploreButton from './ExploreButton'
 import HomeButton from './HomeButton'
 import NotificationsButton from './NotificationsButton'
+import SearchButton from './SearchButton'
 
 export default function BottomNavigationBar() {
   return (
@@ -16,6 +17,7 @@ export default function BottomNavigationBar() {
       }}
     >
       <HomeButton />
+      <SearchButton />
       <ExploreButton />
       <NotificationsButton />
       <AccountButton />

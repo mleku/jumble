@@ -5,9 +5,12 @@ import UserAvatar from '@/components/UserAvatar'
 import Username from '@/components/Username'
 import { useSearchProfiles } from '@/hooks'
 import { toNote } from '@/lib/link'
+import { randomString } from '@/lib/random'
 import { normalizeUrl } from '@/lib/url'
 import { cn } from '@/lib/utils'
 import { usePrimaryPage, useSecondaryPage } from '@/PageManager'
+import { useScreenSize } from '@/providers/ScreenSizeProvider'
+import modalManager from '@/services/modal-manager.service'
 import { TProfile } from '@/types'
 import { Hash, Notebook, Server, UserRound } from 'lucide-react'
 import { nip19 } from 'nostr-tools'
@@ -23,6 +26,7 @@ export function SearchPageTitlebar({
   const { t } = useTranslation()
   const { current, display } = usePrimaryPage()
   const { push } = useSecondaryPage()
+  const { isSmallScreen } = useScreenSize()
   const [input, setInput] = useState('')
   const [debouncedInput, setDebouncedInput] = useState(input)
   const { profiles } = useSearchProfiles(debouncedInput, 10)
@@ -38,6 +42,7 @@ export function SearchPageTitlebar({
       return undefined
     }
   }, [input])
+  const id = useMemo(() => `search-${randomString()}`, [])
 
   useEffect(() => {
     if (!input) {
@@ -154,13 +159,28 @@ export function SearchPageTitlebar({
     )
   }, [input, debouncedInput, profiles])
 
+  const showList = useMemo(() => searching && !!list, [searching, list])
+
+  useEffect(() => {
+    if (showList) {
+      modalManager.register(id, () => {
+        blur()
+      })
+    } else {
+      modalManager.unregister(id)
+    }
+  }, [showList])
+
   return (
     <div className="relative flex gap-1 items-center h-full">
-      {searching && list && (
+      {showList && (
         <>
           <div
             className={cn(
-              'absolute top-full -translate-y-1 inset-x-0 bg-surface-background rounded-b-lg pt-1 shadow-lg',
+              'bg-surface-background rounded-b-lg shadow-lg',
+              isSmallScreen
+                ? 'fixed top-12 inset-x-0'
+                : 'absolute top-full -translate-y-1 inset-x-0 pt-1 ',
               searching ? 'z-50' : ''
             )}
             onMouseDown={(e) => e.preventDefault()}
