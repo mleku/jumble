@@ -147,15 +147,18 @@ export function SearchPageTitlebar({ onSearch }: { onSearch: (params: TSearchPar
   return (
     <div className="relative flex gap-2 items-center h-full px-3">
       {searching && list && (
-        <div
-          className={cn(
-            'absolute top-full -translate-y-1 inset-x-3 bg-surface-background rounded-b-lg pt-1 shadow-lg',
-            searching ? 'z-50' : ''
-          )}
-          onMouseDown={(e) => e.preventDefault()}
-        >
-          <ScrollArea className="h-[60vh]">{list}</ScrollArea>
-        </div>
+        <>
+          <div
+            className={cn(
+              'absolute top-full -translate-y-1 inset-x-3 bg-surface-background rounded-b-lg pt-1 shadow-lg',
+              searching ? 'z-50' : ''
+            )}
+            onMouseDown={(e) => e.preventDefault()}
+          >
+            <ScrollArea className="h-[60vh]">{list}</ScrollArea>
+          </div>
+          <div className="fixed inset-0 w-full h-full" onClick={() => blur()} />
+        </>
       )}
       <SearchInput
         ref={searchInputRef}
@@ -164,7 +167,6 @@ export function SearchPageTitlebar({ onSearch }: { onSearch: (params: TSearchPar
         onChange={(e) => setInput(e.target.value)}
         onFocus={() => startSearch()}
       />
-      {searching && <div className="fixed inset-0 w-full h-full" onClick={() => blur()} />}
     </div>
   )
 }
