@@ -1,26 +1,59 @@
+import NormalFeed from '@/components/NormalFeed'
+import Profile from '@/components/Profile'
+import { ProfileListBySearch } from '@/components/ProfileListBySearch'
+import Relay from '@/components/Relay'
+import { BIG_RELAY_URLS, SEARCHABLE_RELAY_URLS } from '@/constants'
 import PrimaryPageLayout from '@/layouts/PrimaryPageLayout'
-import { forwardRef } from 'react'
-import { useTranslation } from 'react-i18next'
+import { forwardRef, useMemo, useState } from 'react'
+import { SearchPageTitlebar } from './SearchPageTitlebar'
+import { TSearchParams } from './types'
 
 const SearchPage = forwardRef((_, ref) => {
+  const [searchParams, setSearchParams] = useState<TSearchParams | null>(null)
+
+  const content = useMemo(() => {
+    if (!searchParams) {
+      return (
+        <div className="p-3 text-sm text-muted-foreground">Please enter a search query above.</div>
+      )
+    }
+    if (searchParams.type === 'profile') {
+      return <Profile id={searchParams.search} />
+    }
+    if (searchParams.type === 'profiles') {
+      return <ProfileListBySearch search={searchParams.search} />
+    }
+    if (searchParams.type === 'notes') {
+      return (
+        <NormalFeed
+          subRequests={[{ urls: SEARCHABLE_RELAY_URLS, filter: { search: searchParams.search } }]}
+        />
+      )
+    }
+    if (searchParams.type === 'hashtag') {
+      return (
+        <NormalFeed
+          subRequests={[{ urls: BIG_RELAY_URLS, filter: { '#t': [searchParams.search] } }]}
+        />
+      )
+    }
+    return <Relay url={searchParams.search} />
+  }, [searchParams])
+
+  const onSearch = (params: TSearchParams) => {
+    setSearchParams(params)
+  }
+
   return (
     <PrimaryPageLayout
       ref={ref}
       pageName="search"
-      titlebar={<SearchPageTitlebar />}
+      titlebar={<SearchPageTitlebar onSearch={onSearch} />}
       displayScrollToTopButton
-    ></PrimaryPageLayout>
+    >
+      {content}
+    </PrimaryPageLayout>
   )
 })
 SearchPage.displayName = 'SearchPage'
 export default SearchPage
-
-function SearchPageTitlebar() {
-  const { t } = useTranslation()
-
-  return (
-    <div className="flex gap-2 items-center h-full pl-3">
-      <div className="text-lg font-semibold">{t('Search')}</div>
-    </div>
-  )
-}
