@@ -1,12 +1,14 @@
+import { useSecondaryPage } from '@/PageManager'
 import BookmarkList from '@/components/BookmarkList'
 import PostEditor from '@/components/PostEditor'
 import { Button } from '@/components/ui/button'
 import PrimaryPageLayout from '@/layouts/PrimaryPageLayout'
+import { toSearch } from '@/lib/link'
 import { useFeed } from '@/providers/FeedProvider'
 import { useNostr } from '@/providers/NostrProvider'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import { TPageRef } from '@/types'
-import { PencilLine } from 'lucide-react'
+import { PencilLine, Search } from 'lucide-react'
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import FeedButton from './FeedButton'
@@ -75,7 +77,12 @@ function NoteListPageTitlebar() {
   return (
     <div className="flex gap-1 items-center h-full justify-between">
       <FeedButton className="flex-1 max-w-fit w-0" />
-      <div className="shrink-0 flex gap-1 items-center">{isSmallScreen && <PostButton />}</div>
+      {isSmallScreen && (
+        <div className="shrink-0 flex gap-1 items-center">
+          <SearchButton />
+          <PostButton />
+        </div>
+      )}
     </div>
   )
 }
@@ -100,5 +107,15 @@ function PostButton() {
       </Button>
       <PostEditor open={open} setOpen={setOpen} />
     </>
+  )
+}
+
+function SearchButton() {
+  const { push } = useSecondaryPage()
+
+  return (
+    <Button variant="ghost" size="titlebar-icon" onClick={() => push(toSearch())}>
+      <Search />
+    </Button>
   )
 }

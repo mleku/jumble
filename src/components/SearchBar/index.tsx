@@ -8,7 +8,7 @@ import { toNote } from '@/lib/link'
 import { randomString } from '@/lib/random'
 import { normalizeUrl } from '@/lib/url'
 import { cn } from '@/lib/utils'
-import { usePrimaryPage, useSecondaryPage } from '@/PageManager'
+import { useSecondaryPage } from '@/PageManager'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import modalManager from '@/services/modal-manager.service'
 import { TProfile, TSearchParams } from '@/types'
@@ -17,9 +17,14 @@ import { nip19 } from 'nostr-tools'
 import { HTMLAttributes, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-export function SearchBar({ onSearch }: { onSearch: (params: TSearchParams | null) => void }) {
+export function SearchBar({
+  onSearch,
+  active
+}: {
+  onSearch: (params: TSearchParams | null) => void
+  active?: boolean
+}) {
   const { t } = useTranslation()
-  const { current, display } = usePrimaryPage()
   const { push } = useSecondaryPage()
   const { isSmallScreen } = useScreenSize()
   const [input, setInput] = useState('')
@@ -46,10 +51,10 @@ export function SearchBar({ onSearch }: { onSearch: (params: TSearchParams | nul
   }, [input])
 
   useEffect(() => {
-    if (current === 'search' && display) {
+    if (active) {
       searchInputRef.current?.focus()
     }
-  }, [current, display])
+  }, [active])
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -167,7 +172,7 @@ export function SearchBar({ onSearch }: { onSearch: (params: TSearchParams | nul
   }, [showList])
 
   return (
-    <div className="relative flex gap-1 items-center h-full">
+    <div className="relative flex gap-1 items-center h-full w-full">
       {showList && (
         <>
           <div
@@ -263,17 +268,13 @@ function RelayItem({ url, onClick }: { url: string; onClick?: () => void }) {
   )
 }
 
-function Item({ className, children, onClick, ...props }: HTMLAttributes<HTMLDivElement>) {
+function Item({ className, children, ...props }: HTMLAttributes<HTMLDivElement>) {
   return (
     <div
       className={cn(
-        'flex gap-2 items-center p-2 hover:bg-accent rounded-md cursor-pointer',
+        'flex gap-2 items-center px-2 py-3 hover:bg-accent rounded-md cursor-pointer',
         className
       )}
-      onClick={(e) => {
-        console.log('click')
-        onClick?.(e)
-      }}
       {...props}
     >
       {children}
