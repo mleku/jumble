@@ -12,7 +12,6 @@ import { useTranslation } from 'react-i18next'
 import FeedButton from './FeedButton'
 import FollowingFeed from './FollowingFeed'
 import RelaysFeed from './RelaysFeed'
-import SearchButton from './SearchButton'
 
 const NoteListPage = forwardRef((_, ref) => {
   const { t } = useTranslation()
@@ -76,10 +75,7 @@ function NoteListPageTitlebar() {
   return (
     <div className="flex gap-1 items-center h-full justify-between">
       <FeedButton className="flex-1 max-w-fit w-0" />
-      <div className="shrink-0 flex gap-1 items-center">
-        <SearchButton />
-        {isSmallScreen && <PostButton />}
-      </div>
+      <div className="shrink-0 flex gap-1 items-center">{isSmallScreen && <PostButton />}</div>
     </div>
   )
 }
