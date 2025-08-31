@@ -6,6 +6,7 @@ import { BIG_RELAY_URLS, SEARCHABLE_RELAY_URLS } from '@/constants'
 import PrimaryPageLayout from '@/layouts/PrimaryPageLayout'
 import { forwardRef, useMemo, useState } from 'react'
 import { SearchPageTitlebar } from './SearchPageTitlebar'
+import TrendingNotes from './TrendingNotes'
 import { TSearchParams } from './types'
 
 const SearchPage = forwardRef((_, ref) => {
@@ -13,9 +14,7 @@ const SearchPage = forwardRef((_, ref) => {
 
   const content = useMemo(() => {
     if (!searchParams) {
-      return (
-        <div className="p-3 text-sm text-muted-foreground">Please enter a search query above.</div>
-      )
+      return <TrendingNotes />
     }
     if (searchParams.type === 'profile') {
       return <Profile id={searchParams.search} />
