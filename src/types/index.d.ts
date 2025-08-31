@@ -174,3 +174,10 @@ export type TPollCreateData = {
   relays: string[]
   endsAt?: number
 }
+
+export type TSearchType = 'profile' | 'profiles' | 'notes' | 'hashtag' | 'relay'
+
+export type TSearchParams = {
+  type: TSearchType
+  search: string
+}

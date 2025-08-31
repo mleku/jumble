@@ -11,18 +11,13 @@ import { cn } from '@/lib/utils'
 import { usePrimaryPage, useSecondaryPage } from '@/PageManager'
 import { useScreenSize } from '@/providers/ScreenSizeProvider'
 import modalManager from '@/services/modal-manager.service'
-import { TProfile } from '@/types'
+import { TProfile, TSearchParams } from '@/types'
 import { Hash, Notebook, Server, UserRound } from 'lucide-react'
 import { nip19 } from 'nostr-tools'
 import { HTMLAttributes, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { TSearchParams } from './types'
 
-export function SearchPageTitlebar({
-  onSearch
-}: {
-  onSearch: (params: TSearchParams | null) => void
-}) {
+export function SearchBar({ onSearch }: { onSearch: (params: TSearchParams | null) => void }) {
   const { t } = useTranslation()
   const { current, display } = usePrimaryPage()
   const { push } = useSecondaryPage()
