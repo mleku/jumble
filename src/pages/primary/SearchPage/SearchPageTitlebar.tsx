@@ -15,7 +15,11 @@ import { HTMLAttributes, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { TSearchParams } from './types'
 
-export function SearchPageTitlebar({ onSearch }: { onSearch: (params: TSearchParams) => void }) {
+export function SearchPageTitlebar({
+  onSearch
+}: {
+  onSearch: (params: TSearchParams | null) => void
+}) {
   const { t } = useTranslation()
   const { current, display } = usePrimaryPage()
   const { push } = useSecondaryPage()
@@ -32,6 +36,12 @@ export function SearchPageTitlebar({ onSearch }: { onSearch: (params: TSearchPar
       return normalizeUrl(input)
     } catch {
       return undefined
+    }
+  }, [input])
+
+  useEffect(() => {
+    if (!input) {
+      onSearch(null)
     }
   }, [input])
 
@@ -145,12 +155,12 @@ export function SearchPageTitlebar({ onSearch }: { onSearch: (params: TSearchPar
   }, [input, debouncedInput, profiles])
 
   return (
-    <div className="relative flex gap-2 items-center h-full px-3">
+    <div className="relative flex gap-1 items-center h-full">
       {searching && list && (
         <>
           <div
             className={cn(
-              'absolute top-full -translate-y-1 inset-x-3 bg-surface-background rounded-b-lg pt-1 shadow-lg',
+              'absolute top-full -translate-y-1 inset-x-0 bg-surface-background rounded-b-lg pt-1 shadow-lg',
               searching ? 'z-50' : ''
             )}
             onMouseDown={(e) => e.preventDefault()}
@@ -162,7 +172,10 @@ export function SearchPageTitlebar({ onSearch }: { onSearch: (params: TSearchPar
       )}
       <SearchInput
         ref={searchInputRef}
-        className={cn('bg-surface-background shadow-inner', searching ? 'z-50' : '')}
+        className={cn(
+          'bg-surface-background shadow-inner h-full border-none',
+          searching ? 'z-50' : ''
+        )}
         value={input}
         onChange={(e) => setInput(e.target.value)}
         onFocus={() => startSearch()}

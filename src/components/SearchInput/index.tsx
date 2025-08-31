@@ -5,10 +5,20 @@ import { ComponentProps, forwardRef, useEffect, useState } from 'react'
 const SearchInput = forwardRef<HTMLInputElement, ComponentProps<'input'>>(
   ({ value, onChange, className, ...props }, ref) => {
     const [displayClear, setDisplayClear] = useState(false)
+    const [inputRef, setInputRef] = useState<HTMLInputElement | null>(null)
 
     useEffect(() => {
       setDisplayClear(!!value)
     }, [value])
+
+    function setRefs(el: HTMLInputElement) {
+      setInputRef(el)
+      if (typeof ref === 'function') {
+        ref(el)
+      } else if (ref) {
+        ;(ref as React.MutableRefObject<HTMLInputElement | null>).current = el
+      }
+    }
 
     return (
       <div
@@ -18,17 +28,22 @@ const SearchInput = forwardRef<HTMLInputElement, ComponentProps<'input'>>(
           className
         )}
       >
-        <SearchIcon className="size-4 shrink-0 opacity-50" />
+        <SearchIcon className="size-4 shrink-0 opacity-50" onClick={() => inputRef?.focus()} />
         <input
           {...props}
-          ref={ref}
+          name="search-input"
+          ref={setRefs}
           value={value}
           onChange={onChange}
           className="size-full mx-2 border-none bg-transparent focus:outline-none placeholder:text-muted-foreground"
         />
         {displayClear && (
-          <button type="button" onClick={() => onChange?.({ target: { value: '' } } as any)}>
-            <X className="size-4 shrink-0 opacity-50 hover:opacity-100" />
+          <button
+            type="button"
+            className="rounded-full bg-foreground/40 hover:bg-foreground transition-opacity size-5 shrink-0 flex flex-col items-center justify-center"
+            onClick={() => onChange?.({ target: { value: '' } } as any)}
+          >
+            <X className="!size-3 shrink-0 text-background" strokeWidth={4} />
           </button>
         )}
       </div>

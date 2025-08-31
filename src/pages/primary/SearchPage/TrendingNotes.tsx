@@ -1,11 +1,11 @@
 import NoteCard, { NoteCardLoadingSkeleton } from '@/components/NoteCard'
-import { NostrEvent, Relay, validateEvent } from 'nostr-tools'
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { useTranslation } from 'react-i18next'
-import client from '@/services/client.service'
+import { getReplaceableCoordinateFromEvent, isReplaceableEvent } from '@/lib/event'
 import { useDeletedEvent } from '@/providers/DeletedEventProvider'
 import { useUserTrust } from '@/providers/UserTrustProvider'
-import { getReplaceableCoordinateFromEvent, isReplaceableEvent } from '@/lib/event'
+import client from '@/services/client.service'
+import { NostrEvent } from 'nostr-tools'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 const SHOW_COUNT = 10
 
@@ -36,32 +36,9 @@ export default function TrendingNotes() {
   useEffect(() => {
     const fetchTrendingPosts = async () => {
       setLoading(true)
-      try {
-        const response = await fetch('https://api.nostr.band/v0/trending/notes')
-        const data = await response.json()
-        const events: NostrEvent[] = []
-        for (const note of data.notes ?? []) {
-          if (validateEvent(note.event)) {
-            events.push(note.event)
-            client.addEventToCache(note.event)
-            if (note.relays?.length) {
-              note.relays.map((r: string) => {
-                try {
-                  const relay = new Relay(r)
-                  client.trackEventSeenOn(note.event.id, relay)
-                } catch {
-                  return null
-                }
-              })
-            }
-          }
-        }
-        setTrendingNotes(events)
-      } catch (error) {
-        console.error('Error fetching trending posts:', error)
-      } finally {
-        setLoading(false)
-      }
+      const events = await client.fetchTrendingNotes()
+      setTrendingNotes(events)
+      setLoading(false)
     }
 
     fetchTrendingPosts()
@@ -97,7 +74,7 @@ export default function TrendingNotes() {
 
   return (
     <div className="min-h-screen">
-      <div className="sticky top-12 px-4 py-3 text-lg font-bold bg-background z-30 border-b">
+      <div className="sticky top-12 h-12 px-4 flex flex-col justify-center text-lg font-bold bg-background z-30 border-b">
         {t('Trending Notes')}
       </div>
       {filteredEvents.map((event) => (

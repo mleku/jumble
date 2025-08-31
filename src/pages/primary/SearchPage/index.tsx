@@ -39,7 +39,7 @@ const SearchPage = forwardRef((_, ref) => {
     return <Relay url={searchParams.search} />
   }, [searchParams])
 
-  const onSearch = (params: TSearchParams) => {
+  const onSearch = (params: TSearchParams | null) => {
     setSearchParams(params)
   }
 
